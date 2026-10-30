@@ -30,7 +30,7 @@ Installation pas à pas : `docs/installation.pdf`. Schéma et justifications : `
 | Échappement | créer un apprenant « D'Alembert & Fils » |
 | Déconnexion + bouton Retour | `logout.php` |
 
-Sauvegardez la base avant de passer : `mysqldump -u root -p skooly > sauvegarde.sql`.
+Sauvegardez la base avant de passer : `mysqldump -u root -p --result-file=sauvegarde.sql skooly` (avec `--result-file`, et **pas** `>` : dans PowerShell, `>` enregistre en UTF-16 et abîme les accents à la restauration).
 
 ## Travail d'équipe
 

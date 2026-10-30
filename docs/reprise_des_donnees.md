@@ -10,7 +10,7 @@ Source : `ressources-skooly.xlsx` · généré par `tools/xlsx_vers_sql.py` (rej
 | Promotions | (déduites des apprenants) | 8 |
 | Intervenants | 22 | 21 (doublon fusionné) |
 | Matières | 11 | 11 |
-| Salles | 5 | 5 |
+| Salles | 9 | 9 |
 | Liens intervenant–matière | (colonne « matieres ») | 28 |
 
 ## Ce qui a été fait, catégorie par catégorie
@@ -19,10 +19,9 @@ Source : `ressources-skooly.xlsx` · généré par `tools/xlsx_vers_sql.py` (rej
 
 - Ferreira Ana : « 2007-13-05 » → 13/05/2007 (jour et mois inversés)
 
-### ⚠ Données absentes du classeur (hypothèses à valider) (3)
+### ⚠ Données absentes du classeur (hypothèses à valider) (2)
 
 - Promotions : le classeur ne donne que le code. Libellés repris du sujet ; dates de début/fin supposées 01/09/2025 → 30/06/2026 (le planning du classeur commence le 01/09/2025).
-- Salles : libellé généré (« Salle 101 ») et bâtiment « Non renseigné » (colonnes absentes du classeur, obligatoires en base) : à compléter dans l'application.
 - Apprenants : le régime est déduit de l'entreprise (renseignée → alternant, vide → initial) ; le statut de scolarité est « inscrit » pour tous.
 
 ### ⚠ E-mails corrigés (hypothèse à valider) (1)
@@ -36,21 +35,12 @@ Source : `ressources-skooly.xlsx` · généré par `tools/xlsx_vers_sql.py` (rej
 - Blanc Pierre : « Gratuit » → 0,00 €/h (intervenant ponctuel)
 - Caron Lea : « vide » → 0,00 €/h avec remarque « à renseigner » (un vacataire doit avoir un tarif)
 
-### ⚠ Vidéoprojecteur : valeur absente (hypothèse à valider) (1)
-
-- Salle 103 : case vide mais remarque « videoproj HS depuis fevrier » → il y a un vidéoprojecteur (en panne) → oui
-
 ### Accents restaurés sur les libellés de matières (4)
 
 - « Comptabilite generale » → « Comptabilité générale »
 - « Comptabilite analytique » → « Comptabilité analytique »
 - « Fiscalite » → « Fiscalité »
 - « Mathematiques financieres » → « Mathématiques financières »
-
-### Capacités converties en entiers (2)
-
-- Salle 102 : « 25 places » → 25
-- Salle 103 : « ~30 » → 30 (≈ approximatif dans le classeur)
 
 ### Casse et espaces des noms/prénoms (40)
 
@@ -157,10 +147,6 @@ Source : `ressources-skooly.xlsx` · généré par `tools/xlsx_vers_sql.py` (rej
 
 - Ostermann Claire
 - Hoffmann Amandine
-
-### Oui/non normalisés (1)
-
-- Salle 102 : « O » → oui
 
 ### Statuts corrigés (1)
 

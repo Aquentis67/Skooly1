@@ -105,11 +105,15 @@ INSERT INTO intervenant_matiere (intervenant_id, matiere_id) VALUES
   (21, 10);
 
 INSERT INTO salle (numero, libelle, capacite, batiment, videoprojecteur, remarques) VALUES
-  ('101', 'Salle 101', 25, 'Non renseigné', 1, NULL),
-  ('102', 'Salle 102', 25, 'Non renseigné', 1, NULL),
-  ('103', 'Salle 103', 30, 'Non renseigné', 1, 'videoproj HS depuis fevrier'),
-  ('104', 'Salle 104', 20, 'Non renseigné', 0, NULL),
-  ('105', 'Salle 105', 18, 'Non renseigné', 1, 'postes fixes');
+  ('∞', 'Amphi Nie', 80, 'Bâtiment B', 1, 'Pas assez de sièges pour bien exploiter l''espace'),
+  ('101', 'Salle Ameche', 25, 'Bâtiment A', 1, NULL),
+  ('102', 'Jurassic Salle 🦕', 18, 'Bâtiment A', 0, NULL),
+  ('103', 'Salle Petre', 30, 'Bâtiment A', 1, 'Vidéoprojecteur HS depuis Novembre'),
+  ('104', 'Salle Ami', 20, 'Bâtiment A', 1, NULL),
+  ('201', 'Salle Lyre', 20, 'Bâtiment B', 0, 'En plein travaux 🚧'),
+  ('202', 'Salle Thé', 18, 'Bâtiment B', 1, 'postes fixes'),
+  ('203', 'Amphi Lible', 80, 'Bâtiment B', 1, NULL),
+  ('204', 'Salle Aire', 12, 'Bâtiment B', 0, NULL);
 
 INSERT INTO apprenant (nom, prenom, date_naissance, email, telephone, regime, entreprise, statut, promotion_id) VALUES
   ('Hoffmann', 'Amandine', '1999-06-25', 'a.hoffmann@exemple.fr', '06 37 56 02 62', 'initial', NULL, 'inscrit', 1),

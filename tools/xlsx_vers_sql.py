@@ -137,18 +137,32 @@ note("Colonnes reprises dans un nouveau champ", "Intervenants : « remarques » 
 note("Colonnes reprises dans un nouveau champ", "Intervenants : « matieres » → table `intervenant_matiere` (ajoutée au schéma, RG03).")
 
 # ------------------------------------------------------------------- salles
-salles = []
-for r in lignes("SALLES"):
-    num = str(r[0]).strip(); cap = int(re.search(r"\d+", str(r[1]))[0])
-    if str(r[1]).strip() != str(cap): note("Capacités converties en entiers", f"Salle {num} : « {r[1]} » → {cap}" + (" (≈ approximatif dans le classeur)" if "~" in str(r[1]) else ""))
-    v = str(r[2] or "").strip().lower()
+# Lecture par NOM de colonne : numero, capacite, videoprojecteur, remarque (+ libelle, batiment si presentes).
+def table(nom):
+    rows = list(wb[nom].iter_rows(values_only=True))
+    hdr = [str(h).strip().lower() if h else "" for h in rows[0]]
+    return [dict(zip(hdr, r)) for r in rows[1:] if any(c is not None for c in r)]
+
+salles = []; generes = 0
+for r in table("SALLES"):
+    num = str(r["numero"]).strip(); cap_brut = r["capacite"]
+    if re.search(r"∞|illimit|infini", str(cap_brut), re.I):
+        cap = None; note("Capacités illimitées (NULL, affichées ∞)", f"Salle {num} : « {cap_brut} »")
+    else: cap = int(re.search(r"\d+", str(cap_brut))[0])
+    if cap is not None and str(cap_brut).strip() != str(cap): note("Capacités converties en entiers", f"Salle {num} : « {cap_brut} » → {cap}" + (" (≈ approximatif dans le classeur)" if "~" in str(cap_brut) else ""))
+    rem = " ".join(str(r["remarque"]).split()) if r.get("remarque") else None
+    v = str(r.get("videoprojecteur") or "").strip().lower()
     if v in ("oui", "o"): video = 1
     elif v == "non": video = 0
     else:
-        video = 1; note("⚠ Vidéoprojecteur : valeur absente (hypothèse à valider)", f"Salle {num} : case vide mais remarque « {r[3]} » → il y a un vidéoprojecteur (en panne) → oui")
+        video = 1; note("⚠ Vidéoprojecteur : valeur absente (hypothèse à valider)", f"Salle {num} : case vide (remarque : « {rem} ») → oui")
     if v == "o": note("Oui/non normalisés", f"Salle {num} : « O » → oui")
-    salles.append((num, f"Salle {num}", cap, "Non renseigné", video, " ".join(str(r[3]).split()) if r[3] else None))
-note("⚠ Données absentes du classeur (hypothèses à valider)", "Salles : libellé généré (« Salle 101 ») et bâtiment « Non renseigné » (colonnes absentes du classeur, obligatoires en base) : à compléter dans l'application.")
+    lib = " ".join(str(r["libelle"]).split()) if r.get("libelle") else None
+    bat = " ".join(str(r["batiment"]).split()) if r.get("batiment") else None
+    if not lib or not bat: generes += 1
+    salles.append((num, lib or f"Salle {num}", cap, bat or "Non renseigné", video, rem))
+if generes:
+    note("⚠ Données absentes du classeur (hypothèses à valider)", f"Salles : libellé généré (« Salle 101 ») et/ou bâtiment « Non renseigné » pour {generes} salle(s) (colonnes absentes ou vides dans l'onglet SALLES, obligatoires en base).")
 
 # --------------------------------------------------------------- apprenants
 apprenants = []
@@ -159,7 +173,7 @@ for r in lignes("Apprenants"):
 note("⚠ Données absentes du classeur (hypothèses à valider)", "Apprenants : le régime est déduit de l'entreprise (renseignée → alternant, vide → initial) ; le statut de scolarité est « inscrit » pour tous.")
 
 # ---------------------------------------------------- controles de coherence
-assert len(apprenants) == 105 and len(promotions) == 8 and len(intervenants) == 21 and len(salles) == 5, (len(apprenants), len(promotions), len(intervenants), len(salles))
+assert len(apprenants) == 105 and len(promotions) == 8 and len(intervenants) == 21 and len(salles) >= 1, (len(apprenants), len(promotions), len(intervenants), len(salles))
 assert len({a[3] for a in apprenants}) == 105 and len({i[3] for i in intervenants}) == 21
 assert all(a[2] <= datetime.date(2012, 1, 1) for a in apprenants)
 
@@ -185,7 +199,7 @@ w(",\n".join(f"  ({i}, {q(n)}, {q(p)}, {q(m)}, {q(t)}, {q(s)}, {'NULL' if tf is 
 w("INSERT INTO intervenant_matiere (intervenant_id, matiere_id) VALUES")
 w(",\n".join(f"  ({a}, {b})" for a, b in liens) + ";\n")
 w("INSERT INTO salle (numero, libelle, capacite, batiment, videoprojecteur, remarques) VALUES")
-w(",\n".join(f"  ({q(a)}, {q(b)}, {c}, {q(d)}, {e}, {q(f)})" for a, b, c, d, e, f in salles) + ";\n")
+w(",\n".join(f"  ({q(a)}, {q(b)}, {'NULL' if c is None else c}, {q(d)}, {e}, {q(f)})" for a, b, c, d, e, f in salles) + ";\n")
 w("INSERT INTO apprenant (nom, prenom, date_naissance, email, telephone, regime, entreprise, statut, promotion_id) VALUES")
 w(",\n".join(f"  ({q(a[0])}, {q(a[1])}, '{a[2]}', {q(a[3])}, {q(a[4])}, {q(a[5])}, {q(a[6])}, {q(a[7])}, {a[8]})" for a in apprenants))
 o[-1] += ";"
@@ -230,7 +244,7 @@ rp = ["# Reprise des données du classeur — rapport de nettoyage", "",
       "## Résultat", "", "| Ensemble | Lignes du classeur | Lignes en base |", "|---|---|---|",
       f"| Apprenants | {len(lignes('Apprenants'))} | {len(apprenants)} |", f"| Promotions | (déduites des apprenants) | {len(promotions)} |",
       f"| Intervenants | {len(lignes('Intervenants'))} | {len(intervenants)} (doublon fusionné) |", f"| Matières | {len(lignes('Matieres'))} | {len(matieres)} |",
-      f"| Salles | {len(lignes('SALLES'))} | {len(salles)} |", f"| Liens intervenant–matière | (colonne « matieres ») | {len(liens)} |", "",
+      f"| Salles | {len(table('SALLES'))} | {len(salles)} |", f"| Liens intervenant–matière | (colonne « matieres ») | {len(liens)} |", "",
       "## Ce qui a été fait, catégorie par catégorie", ""]
 for c in ordre:
     items = journal[c]; rp.append(f"### {c} ({len(items)})"); rp.append("")

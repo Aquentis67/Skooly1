@@ -52,7 +52,7 @@ mysql -u root -p < sql/04_interventions_illustratives.sql    # optionnel
 
 | 4 *(optionnel)* | `sql/04_interventions_illustratives.sql` | Charge des interventions **d'exemple** (le classeur n'en contient pas) pour que la page *Promotion* affiche des heures | administrateur (`root`) |
 
-Le script 03 contient les données **réelles** du classeur du Campus, nettoyées (105 apprenants, 8 promotions, 21 intervenants, 11 matières, 5 salles). Le rapport de nettoyage est dans `docs/reprise_des_donnees.md`.
+Le script 03 contient les données **réelles** du classeur du Campus, nettoyées (105 apprenants, 8 promotions, 21 intervenants, 11 matières, 9 salles). Le rapport de nettoyage est dans `docs/reprise_des_donnees.md`.
 
 Les scripts 01, 03 et 04 sont **rejouables** : pour repartir d'une base propre, rejouez 01, puis 03 (et 04 si vous le souhaitez). Le compte du script 02 survit et n'a pas besoin d'être recréé.
 
@@ -86,7 +86,7 @@ Ce compte est créé par le script 03 (jamais par une page web). Le mot de passe
 # 7. Vérifier que tout fonctionne
 
 * Taper `http://localhost:8000/apprenants.php` sans être connecté renvoie vers la page de connexion.
-* Après connexion, le tableau de bord affiche : **105** apprenants, **8** promotions, **21** intervenants, **11** matières, **5** salles (et **24** interventions si le script 04 a été joué).
+* Après connexion, le tableau de bord affiche : **105** apprenants, **8** promotions, **21** intervenants, **11** matières, **9** salles (et **24** interventions si le script 04 a été joué).
 
 # 8. En cas de problème
 

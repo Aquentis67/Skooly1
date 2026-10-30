@@ -1,11 +1,8 @@
-MISE A JOUR : donnees reelles du classeur + schema complete
-============================================================
-1. Copiez le contenu du dossier "skooly" de cette archive PAR-DESSUS votre dossier skooly
-   (mêmes sous-dossiers ; ne touchez pas a config/config.php).
-2. SUPPRIMEZ l'ancien fichier  tools/generer_jeu_demo.py  (remplace par tools/xlsx_vers_sql.py).
-3. Reconstruisez la base, dans cet ordre (phpMyAdmin > Importer) :
-      sql/01_creation_base.sql
-      sql/03_jeu_demonstration.sql
-      sql/04_interventions_illustratives.sql   (optionnel : interventions d'exemple)
-   (le compte MySQL du script 02 existe deja : inutile de le rejouer)
-4. Ctrl+F5 dans le navigateur, puis connexion admin / Skooly2026!
+MISE A JOUR : vos 9 salles sont desormais dans le classeur et dans les scripts SQL
+==================================================================================
+Sur VOTRE poste, votre base contient deja ces salles : n'importez rien, copiez juste les fichiers.
+Cette mise a jour sert aux AUTRES installations (camarade, autre poste, rejeu des scripts).
+
+1. Copiez le contenu du dossier "skooly" PAR-DESSUS votre dossier skooly (ne touchez pas a config/config.php).
+2. git add . / git commit -m "Salles personnalisees dans le classeur et le script 03" / git push
+3. Sur un poste NEUF seulement : importer 01, 02, 03 (et 04 en option) comme d'habitude.
