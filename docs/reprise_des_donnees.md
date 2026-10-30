@@ -2,6 +2,8 @@
 
 Source : `ressources-skooly.xlsx` · généré par `tools/xlsx_vers_sql.py` (rejouable).
 
+Les hypothèses marquées ✔ sont validées par l'étudiant le 30/10/2026.
+
 ## Résultat
 
 | Ensemble | Lignes du classeur | Lignes en base |
@@ -15,20 +17,20 @@ Source : `ressources-skooly.xlsx` · généré par `tools/xlsx_vers_sql.py` (rej
 
 ## Ce qui a été fait, catégorie par catégorie
 
-### ⚠ Dates impossibles corrigées (hypothèse à valider) (1)
+### ✔ Dates impossibles corrigées (hypothèse validée) (1)
 
 - Ferreira Ana : « 2007-13-05 » → 13/05/2007 (jour et mois inversés)
 
-### ⚠ Données absentes du classeur (hypothèses à valider) (2)
+### ✔ Données absentes du classeur (hypothèses validées) (2)
 
 - Promotions : le classeur ne donne que le code. Libellés repris du sujet ; dates de début/fin supposées 01/09/2025 → 30/06/2026 (le planning du classeur commence le 01/09/2025).
 - Apprenants : le régime est déduit de l'entreprise (renseignée → alternant, vide → initial) ; le statut de scolarité est « inscrit » pour tous.
 
-### ⚠ E-mails corrigés (hypothèse à valider) (1)
+### ✔ E-mails corrigés (hypothèse validée) (1)
 
 - Fischer Julie : « j.fischer@exemple » → « j.fischer@exemple.fr » (extension .fr manquante, comme tous les autres)
 
-### ⚠ Tarifs particuliers (hypothèse à valider) (4)
+### ✔ Tarifs particuliers (hypothèse validée) (4)
 
 - Vogel Anne : « a revoir » → 0,00 €/h avec remarque « à renseigner » (un vacataire doit avoir un tarif)
 - Moreau Alain : « vide » → 0,00 €/h avec remarque « à renseigner » (un vacataire doit avoir un tarif)

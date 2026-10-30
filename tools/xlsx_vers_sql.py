@@ -20,6 +20,7 @@ RACINE = pathlib.Path(__file__).resolve().parent.parent
 CLASSEUR = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else RACINE / "tools" / "donnees" / "ressources-skooly.xlsx"
 HASH_ADMIN = "$2y$10$is0CqZhho8/7ITAcHDXYVujGPwppPuBzc1ar2V/zuNwfjp5/Mv4ES"  # mot de passe : Skooly2026!
 
+VALIDATION = "validées par l'étudiant le 30/10/2026"   # a mettre a jour si une hypothese change
 journal = collections.defaultdict(list)      # categorie -> [descriptions]
 def note(cat, txt): journal[cat].append(txt)
 
@@ -50,7 +51,7 @@ def mail(s, qui):
     if m != str(s): note("E-mails passés en minuscules", qui)
     if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", m):
         if re.fullmatch(r"[^@\s]+@[^@\s.]+", m):
-            note("⚠ E-mails corrigés (hypothèse à valider)", f"{qui} : « {m} » → « {m}.fr » (extension .fr manquante, comme tous les autres)")
+            note("✔ E-mails corrigés (hypothèse validée)", f"{qui} : « {m} » → « {m}.fr » (extension .fr manquante, comme tous les autres)")
             m += ".fr"
     return m
 
@@ -65,7 +66,7 @@ def date_naiss(s, qui):
     m = re.fullmatch(r"(\d{4})-(\d{2})-(\d{2})", d)                 # 2007-13-05 : mois 13 impossible
     if m and int(m[2]) > 12 and int(m[3]) <= 12:
         r = datetime.date(int(m[1]), int(m[3]), int(m[2]))
-        note("⚠ Dates impossibles corrigées (hypothèse à valider)", f"{qui} : « {d} » → {r:%d/%m/%Y} (jour et mois inversés)")
+        note("✔ Dates impossibles corrigées (hypothèse validée)", f"{qui} : « {d} » → {r:%d/%m/%Y} (jour et mois inversés)")
         return r
     raise SystemExit(f"Date illisible pour {qui} : {d!r}")
 
@@ -81,7 +82,7 @@ promotions = []
 for i, c in enumerate(sorted(codes_promo), 1):
     typ, an = c.split(); promotions.append((i, c, f"{LIB[typ]} - {an}{'re' if an == '1' else 'e'} année", "2025-09-01", "2026-06-30"))
 id_promo = {p[1]: p[0] for p in promotions}
-note("⚠ Données absentes du classeur (hypothèses à valider)", "Promotions : le classeur ne donne que le code. Libellés repris du sujet ; dates de début/fin supposées 01/09/2025 → 30/06/2026 (le planning du classeur commence le 01/09/2025).")
+note("✔ Données absentes du classeur (hypothèses validées)", "Promotions : le classeur ne donne que le code. Libellés repris du sujet ; dates de début/fin supposées 01/09/2025 → 30/06/2026 (le planning du classeur commence le 01/09/2025).")
 
 # -------------------------------------------------------------------- matieres
 # Libelles du classeur sans accents : restaures a la main (liste fermee, sans ambiguite).
@@ -126,10 +127,10 @@ for idx, (m, grp) in enumerate(groupes.items(), 1):
         if tarif is not None:
             if brut != str(tarif.quantize(Decimal('0.01'))) : note("Tarifs convertis en nombres", f"{nom} {pre} : « {brut} » → {tarif:.2f}")
         elif brut.lower() == "gratuit":
-            tarif = Decimal(0); note("⚠ Tarifs particuliers (hypothèse à valider)", f"{nom} {pre} : « Gratuit » → 0,00 €/h (intervenant ponctuel)")
+            tarif = Decimal(0); note("✔ Tarifs particuliers (hypothèse validée)", f"{nom} {pre} : « Gratuit » → 0,00 €/h (intervenant ponctuel)")
         else:
             tarif = Decimal(0); rem.append("Tarif horaire à renseigner (absent ou illisible dans le classeur" + (f" : « {brut} »)." if brut else ")."))
-            note("⚠ Tarifs particuliers (hypothèse à valider)", f"{nom} {pre} : « {brut or 'vide'} » → 0,00 €/h avec remarque « à renseigner » (un vacataire doit avoir un tarif)")
+            note("✔ Tarifs particuliers (hypothèse validée)", f"{nom} {pre} : « {brut or 'vide'} » → 0,00 €/h avec remarque « à renseigner » (un vacataire doit avoir un tarif)")
     elif r[4] not in (None, ""): note("Tarifs ignorés", f"{nom} {pre} (salarié) : tarif « {r[4]} » ignoré (RG04)")
     intervenants.append((idx, nom, pre, m, tel(r[3], f"{nom} {pre}"), st, tarif, " ".join(rem) or None))
     liens += [(idx, id_mat[c]) for c in mats]
@@ -155,14 +156,14 @@ for r in table("SALLES"):
     if v in ("oui", "o"): video = 1
     elif v == "non": video = 0
     else:
-        video = 1; note("⚠ Vidéoprojecteur : valeur absente (hypothèse à valider)", f"Salle {num} : case vide (remarque : « {rem} ») → oui")
+        video = 1; note("✔ Vidéoprojecteur : valeur absente (hypothèse validée)", f"Salle {num} : case vide (remarque : « {rem} ») → oui")
     if v == "o": note("Oui/non normalisés", f"Salle {num} : « O » → oui")
     lib = " ".join(str(r["libelle"]).split()) if r.get("libelle") else None
     bat = " ".join(str(r["batiment"]).split()) if r.get("batiment") else None
     if not lib or not bat: generes += 1
     salles.append((num, lib or f"Salle {num}", cap, bat or "Non renseigné", video, rem))
 if generes:
-    note("⚠ Données absentes du classeur (hypothèses à valider)", f"Salles : libellé généré (« Salle 101 ») et/ou bâtiment « Non renseigné » pour {generes} salle(s) (colonnes absentes ou vides dans l'onglet SALLES, obligatoires en base).")
+    note("✔ Données absentes du classeur (hypothèses validées)", f"Salles : libellé généré (« Salle 101 ») et/ou bâtiment « Non renseigné » pour {generes} salle(s) (colonnes absentes ou vides dans l'onglet SALLES, obligatoires en base).")
 
 # --------------------------------------------------------------- apprenants
 apprenants = []
@@ -170,7 +171,7 @@ for r in lignes("Apprenants"):
     nom, pre = propre(r[0]), propre(r[1]); qui = f"{nom} {pre}"
     ent = " ".join(str(r[5]).split()) if r[5] else None
     apprenants.append((nom, pre, date_naiss(r[2], qui), mail(r[3], qui), tel(r[4], qui), "alternant" if ent else "initial", ent, "inscrit", id_promo[r[6].strip()]))
-note("⚠ Données absentes du classeur (hypothèses à valider)", "Apprenants : le régime est déduit de l'entreprise (renseignée → alternant, vide → initial) ; le statut de scolarité est « inscrit » pour tous.")
+note("✔ Données absentes du classeur (hypothèses validées)", "Apprenants : le régime est déduit de l'entreprise (renseignée → alternant, vide → initial) ; le statut de scolarité est « inscrit » pour tous.")
 
 # ---------------------------------------------------- controles de coherence
 assert len(apprenants) == 105 and len(promotions) == 8 and len(intervenants) == 21 and len(salles) >= 1, (len(apprenants), len(promotions), len(intervenants), len(salles))
@@ -238,9 +239,10 @@ o4 = ["-- ======================================================================
 (RACINE / "sql" / "04_interventions_illustratives.sql").write_text("\n".join(o4) + "\n", encoding="utf-8")
 
 # ---------------------------------------------------------------- rapport
-ordre = sorted(journal, key=lambda c: (not c.startswith("⚠"), c))
+ordre = sorted(journal, key=lambda c: (not c.startswith("✔"), c))
 rp = ["# Reprise des données du classeur — rapport de nettoyage", "",
       f"Source : `{CLASSEUR.name}` · généré par `tools/xlsx_vers_sql.py` (rejouable).", "",
+      f"Les hypothèses marquées ✔ sont {VALIDATION}.", "",
       "## Résultat", "", "| Ensemble | Lignes du classeur | Lignes en base |", "|---|---|---|",
       f"| Apprenants | {len(lignes('Apprenants'))} | {len(apprenants)} |", f"| Promotions | (déduites des apprenants) | {len(promotions)} |",
       f"| Intervenants | {len(lignes('Intervenants'))} | {len(intervenants)} (doublon fusionné) |", f"| Matières | {len(lignes('Matieres'))} | {len(matieres)} |",
