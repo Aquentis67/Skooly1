@@ -44,7 +44,7 @@ CREATE TABLE apprenant (
 ) ENGINE=InnoDB;
 
 -- -------------------------------------------------------------- intervenant
--- RG04 : tarif obligatoire pour un vacataire, NULL pour un salarie
+-- RG04 : tarif obligatoire pour un vacataire (0 = gratuit/benevole), NULL pour un salarie
 -- RG07 : email unique
 CREATE TABLE intervenant (
     id             INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -54,19 +54,20 @@ CREATE TABLE intervenant (
     telephone      VARCHAR(20)  NULL,
     statut         ENUM('salarie','vacataire') NOT NULL,
     tarif_horaire  DECIMAL(6,2) NULL,
+    remarques      VARCHAR(500) NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uq_intervenant_email (email),
     KEY idx_intervenant_nom (nom, prenom),
     CONSTRAINT ck_intervenant_tarif CHECK (
         (statut = 'salarie'   AND tarif_horaire IS NULL) OR
-        (statut = 'vacataire' AND tarif_horaire IS NOT NULL AND tarif_horaire > 0))
+        (statut = 'vacataire' AND tarif_horaire IS NOT NULL AND tarif_horaire >= 0))
 ) ENGINE=InnoDB;
 
 -- ------------------------------------------------------------------ matiere
 -- RG06 : pas de volume horaire ici (il depend de la promotion)
 CREATE TABLE matiere (
     id       INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    code     VARCHAR(10)  NOT NULL,
+    code     VARCHAR(20)  NOT NULL,
     libelle  VARCHAR(100) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uq_matiere_code (code)
@@ -86,8 +87,25 @@ CREATE TABLE salle (
     CONSTRAINT ck_salle_capacite CHECK (capacite > 0)
 ) ENGINE=InnoDB;
 
+-- ------------------------------------------------------- intervenant_matiere
+-- RG03 : "un intervenant peut enseigner plusieurs matieres, une matiere peut etre
+-- enseignee par plusieurs intervenants" (competence declaree, SANS promotion ni
+-- volume : c'est ce que contient le classeur). CASCADE : ce n'est qu'une association.
+CREATE TABLE intervenant_matiere (
+    id              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    intervenant_id  INT UNSIGNED NOT NULL,
+    matiere_id      INT UNSIGNED NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_intervenant_matiere (intervenant_id, matiere_id),
+    KEY idx_intervenant_matiere_matiere (matiere_id),
+    CONSTRAINT fk_im_intervenant FOREIGN KEY (intervenant_id)
+        REFERENCES intervenant (id) ON DELETE CASCADE,
+    CONSTRAINT fk_im_matiere FOREIGN KEY (matiere_id)
+        REFERENCES matiere (id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- ------------------------------------------------------------- intervention
--- RG03 : relation N-N intervenant/matiere portee par cette table
+-- Une intervention = un intervenant, une matiere, une promotion + un volume.
 -- RG06 : le volume horaire depend du triplet (intervenant, matiere, promotion)
 CREATE TABLE intervention (
     id              INT UNSIGNED NOT NULL AUTO_INCREMENT,

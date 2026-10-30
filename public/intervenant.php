@@ -3,6 +3,7 @@ require __DIR__ . '/../includes/session.php';
 require __DIR__ . '/../includes/commun.php';
 require __DIR__ . '/../includes/fonctions_intervenant.php';
 require __DIR__ . '/../includes/fonctions_intervention.php';
+require __DIR__ . '/../includes/fonctions_matiere.php';
 
 $pdo = pdo();
 $id = param_id();
@@ -14,6 +15,7 @@ if ($intervenant === null) {
 [$tri, $ordre] = lire_tri(COLONNES_TRI_INTERVENTIONS, 'matiere');
 [$lignes, $pagination] = lister_interventions($pdo, ['intervenant_id' => $id], $tri, $ordre, lire_page());
 $total_heures = total_heures_interventions($pdo, ['intervenant_id' => $id]);
+$matieres_enseignees = matieres_de_intervenant($pdo, $id);
 
 entete($intervenant['prenom'] . ' ' . $intervenant['nom'], 'intervenants');
 ?>
@@ -31,6 +33,11 @@ entete($intervenant['prenom'] . ' ' . $intervenant['nom'], 'intervenants');
         <a class="btn btn-outline-secondary" href="intervenants.php">Tous les intervenants</a>
     </div>
 </div>
+
+<p class="mb-1"><strong>Matières enseignées :</strong>
+<?php if (!$matieres_enseignees) : ?><span class="text-muted">aucune</span><?php endif; ?>
+<?php foreach ($matieres_enseignees as $m) : ?><span class="badge text-bg-light border"><?= e($m['libelle']) ?></span> <?php endforeach; ?></p>
+<?php if ($intervenant['remarques'] !== null) : ?><p class="mb-3"><strong>Remarques :</strong> <?= e($intervenant['remarques']) ?></p><?php endif; ?>
 
 <h2 class="h5">Interventions <span class="badge text-bg-secondary"><?= (int) $pagination['total'] ?></span></h2>
 <p class="mb-2"><strong>Total d'heures : <?= e(heures($total_heures)) ?></strong>

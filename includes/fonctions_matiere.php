@@ -65,3 +65,10 @@ function blocage_suppression_matiere(PDO $pdo, array $matiere): ?string
         ? "Suppression refusée : la matière {$matiere['libelle']} est utilisée par $n intervention" . ($n > 1 ? 's' : '') . '.'
         : null;
 }
+
+function compter_enseignants_matiere(PDO $pdo, int $id): int
+{
+    $st = $pdo->prepare('SELECT COUNT(*) FROM intervenant_matiere WHERE matiere_id = :id');
+    $st->execute([':id' => $id]);
+    return (int) $st->fetchColumn();
+}

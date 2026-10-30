@@ -47,7 +47,7 @@ entete($titre, 'matieres');
     <?= csrf_champ() ?>
     <?= note_champs_obligatoires() ?>
     <div class="row">
-        <div class="col-md-4"><?= champ_texte('code', 'Code', $valeurs, $erreurs, ['maxlength' => 10, 'placeholder' => 'CG']) ?></div>
+        <div class="col-md-4"><?= champ_texte('code', 'Code', $valeurs, $erreurs, ['maxlength' => 20, 'placeholder' => 'COMPTA-GEN']) ?></div>
         <div class="col-md-8"><?= champ_texte('libelle', 'Libellé', $valeurs, $erreurs, ['maxlength' => 100]) ?></div>
     </div>
     <div class="d-flex gap-2">

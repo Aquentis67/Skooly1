@@ -74,15 +74,15 @@ function valider_entier_positif(array &$err, string $champ, string $valeur, stri
 }
 
 // Decimal positif a 2 decimales maximum ; accepte la virgule. Retourne "12.50" ou null.
-function valider_decimal_positif(array &$err, string $champ, string $valeur, string $libelle, float $max): ?string
+function valider_decimal_positif(array &$err, string $champ, string $valeur, string $libelle, float $max, bool $zero_ok = false): ?string
 {
     $v = str_replace(',', '.', $valeur);
     if ($valeur === '') {
         $err[$champ] = "$libelle est obligatoire.";
         return null;
     }
-    if (!preg_match('/^\d{1,4}(\.\d{1,2})?$/', $v) || (float) $v <= 0 || (float) $v > $max) {
-        $err[$champ] = "$libelle doit être un nombre positif, 2 décimales maximum, ne dépassant pas " . $max . '.';
+    if (!preg_match('/^\d{1,4}(\.\d{1,2})?$/', $v) || ($zero_ok ? (float) $v < 0 : (float) $v <= 0) || (float) $v > $max) {
+        $err[$champ] = "$libelle doit être un nombre " . ($zero_ok ? 'positif ou nul' : 'positif') . ', 2 décimales maximum, ne dépassant pas ' . $max . '.';
         return null;
     }
     return number_format((float) $v, 2, '.', '');
@@ -139,7 +139,7 @@ function valider_promotion(PDO $pdo, array $v, ?int $id): array
     return $err;
 }
 
-function valider_intervenant(PDO $pdo, array $v, ?int $id): array
+function valider_intervenant(PDO $pdo, array $v, ?int $id, array $matieres = []): array
 {
     $err = [];
     valider_texte($err, 'nom', $v['nom'], 'Le nom', 60);
@@ -151,9 +151,16 @@ function valider_intervenant(PDO $pdo, array $v, ?int $id): array
     valider_telephone($err, 'telephone', $v['telephone']);
     valider_dans_liste($err, 'statut', $v['statut'], STATUTS_INTERVENANT, 'Le statut');
     if ($v['statut'] === 'vacataire') {
-        valider_decimal_positif($err, 'tarif_horaire', $v['tarif_horaire'], 'Le tarif horaire', 999.99);
+        valider_decimal_positif($err, 'tarif_horaire', $v['tarif_horaire'], 'Le tarif horaire', 999.99, true);   // 0 = gratuit
     } elseif ($v['statut'] === 'salarie' && $v['tarif_horaire'] !== '') {
         $err['tarif_horaire'] = 'Le tarif horaire est réservé aux vacataires : laissez ce champ vide pour un salarié.';
+    }
+    valider_texte($err, 'remarques', $v['remarques'] ?? '', 'Les remarques', 500, false);
+    foreach ($v['matieres'] ?? [] as $mid) {
+        if (!ctype_digit((string) $mid) || !array_key_exists((int) $mid, $matieres)) {
+            $err['matieres'] = 'Une des matières cochées est inconnue.';
+            break;
+        }
     }
     return $err;
 }
@@ -161,7 +168,7 @@ function valider_intervenant(PDO $pdo, array $v, ?int $id): array
 function valider_matiere(PDO $pdo, array $v, ?int $id): array
 {
     $err = [];
-    valider_texte($err, 'code', $v['code'], 'Le code', 10);
+    valider_texte($err, 'code', $v['code'], 'Le code', 20);
     if (!isset($err['code'])) {
         if (!preg_match('/^[A-Za-z0-9._-]+$/', $v['code'])) {
             $err['code'] = 'Le code ne peut contenir que lettres, chiffres, point, tiret (pas d’espace).';

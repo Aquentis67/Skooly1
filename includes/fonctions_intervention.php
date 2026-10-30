@@ -76,10 +76,21 @@ function intervention_existe(PDO $pdo, int $intervenant_id, int $matiere_id, int
 
 function creer_intervention(PDO $pdo, int $intervenant_id, int $matiere_id, int $promotion_id, string $volume): int
 {
-    $st = $pdo->prepare('INSERT INTO intervention (intervenant_id, matiere_id, promotion_id, volume_horaire)
-                         VALUES (:i, :m, :p, :v)');
-    $st->execute([':i' => $intervenant_id, ':m' => $matiere_id, ':p' => $promotion_id, ':v' => $volume]);
-    return (int) $pdo->lastInsertId();
+    $pdo->beginTransaction();
+    try {
+        $st = $pdo->prepare('INSERT INTO intervention (intervenant_id, matiere_id, promotion_id, volume_horaire)
+                             VALUES (:i, :m, :p, :v)');
+        $st->execute([':i' => $intervenant_id, ':m' => $matiere_id, ':p' => $promotion_id, ':v' => $volume]);
+        $id = (int) $pdo->lastInsertId();
+        // Enseigner une matiere dans une promotion suppose de pouvoir l'enseigner : on declare le lien (sans doublon).
+        $st = $pdo->prepare('INSERT IGNORE INTO intervenant_matiere (intervenant_id, matiere_id) VALUES (:i, :m)');
+        $st->execute([':i' => $intervenant_id, ':m' => $matiere_id]);
+        $pdo->commit();
+        return $id;
+    } catch (Throwable $t) {
+        $pdo->rollBack();
+        throw $t;
+    }
 }
 
 function supprimer_intervention(PDO $pdo, int $id): void

@@ -22,8 +22,8 @@ skooly/
 ├── config/      config.example.php   (modèle ; config.php n'est jamais versionné)
 ├── includes/    fonctions PHP, connexion, validation, session
 ├── public/      pages, CSS, JavaScript : SEUL dossier servi par le serveur web
-├── sql/         01_creation_base.sql, 02_creation_compte.sql, 03_jeu_demonstration.sql
-├── tools/       générateur du jeu de démonstration
+├── sql/         01_creation_base.sql, 02_creation_compte.sql, 03_jeu_demonstration.sql, 04_interventions_illustratives.sql
+├── tools/       reprise du classeur Excel (xlsx_vers_sql.py), génération du schéma
 └── docs/
 ```
 
@@ -39,7 +39,7 @@ Démarrez **Apache** et **MySQL** depuis le panneau de votre serveur local.
 | 2 | `sql/02_creation_compte.sql` | Crée le compte `skooly_app` : droits SELECT, INSERT, UPDATE, DELETE **sur la base skooly uniquement** | administrateur (`root`) |
 | 3 | `sql/03_jeu_demonstration.sql` | Charge les promotions, apprenants, intervenants, matières, salles, interventions et le compte de démonstration | administrateur (`root`) |
 
-**Avec phpMyAdmin** : onglet *Importer*, choisir le fichier, *Exécuter* — pour chacun des 3 scripts, dans l'ordre.
+**Avec phpMyAdmin** : onglet *Importer*, choisir le fichier, *Exécuter* — pour chacun des scripts, dans l'ordre.
 
 **En ligne de commande** :
 
@@ -47,9 +47,14 @@ Démarrez **Apache** et **MySQL** depuis le panneau de votre serveur local.
 mysql -u root -p < sql/01_creation_base.sql
 mysql -u root -p < sql/02_creation_compte.sql
 mysql -u root -p --default-character-set=utf8mb4 < sql/03_jeu_demonstration.sql
+mysql -u root -p < sql/04_interventions_illustratives.sql    # optionnel
 ```
 
-Les scripts 01 et 03 sont **rejouables** : pour repartir d'une base propre, rejouez 01 puis 03 (le compte du script 02 survit et n'a pas besoin d'être recréé).
+| 4 *(optionnel)* | `sql/04_interventions_illustratives.sql` | Charge des interventions **d'exemple** (le classeur n'en contient pas) pour que la page *Promotion* affiche des heures | administrateur (`root`) |
+
+Le script 03 contient les données **réelles** du classeur du Campus, nettoyées (105 apprenants, 8 promotions, 21 intervenants, 11 matières, 5 salles). Le rapport de nettoyage est dans `docs/reprise_des_donnees.md`.
+
+Les scripts 01, 03 et 04 sont **rejouables** : pour repartir d'une base propre, rejouez 01, puis 03 (et 04 si vous le souhaitez). Le compte du script 02 survit et n'a pas besoin d'être recréé.
 
 # 4. Renseigner les identifiants de la base
 
@@ -81,7 +86,7 @@ Ce compte est créé par le script 03 (jamais par une page web). Le mot de passe
 # 7. Vérifier que tout fonctionne
 
 * Taper `http://localhost:8000/apprenants.php` sans être connecté renvoie vers la page de connexion.
-* Après connexion, le tableau de bord affiche : **105** apprenants, **8** promotions, **21** intervenants, **5** salles.
+* Après connexion, le tableau de bord affiche : **105** apprenants, **8** promotions, **21** intervenants, **11** matières, **5** salles (et **24** interventions si le script 04 a été joué).
 
 # 8. En cas de problème
 

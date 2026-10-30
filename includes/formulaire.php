@@ -61,6 +61,25 @@ function champ_zone(string $nom, string $libelle, array $valeurs, array $erreurs
     return $h . '</div>';
 }
 
+// Cases a cocher multiples (name="nom[]"). $options : valeur => libelle ; $choisis : valeurs cochees
+function champ_cases(string $nom, string $libelle, array $options, array $choisis, array $erreurs, array $o = []): string
+{
+    $o += ['aide' => ''];
+    $choisis = array_map('strval', $choisis);
+    $h = '<fieldset class="mb-3" id="ligne-' . e($nom) . '"><legend class="form-label fs-6">' . e($libelle) . '</legend>';
+    $h .= '<div class="row row-cols-1 row-cols-md-2 g-1">';
+    foreach ($options as $valeur => $texte) {
+        $id = 'champ-' . $nom . '-' . (int) $valeur;
+        $h .= '<div class="col"><div class="form-check"><input class="form-check-input' . (isset($erreurs[$nom]) ? ' is-invalid' : '') . '" type="checkbox" id="' . e($id) . '" name="' . e($nom) . '[]" value="' . e($valeur) . '"'
+            . (in_array((string) $valeur, $choisis, true) ? ' checked' : '') . '><label class="form-check-label" for="' . e($id) . '">' . e($texte) . '</label></div></div>';
+    }
+    $h .= '</div>' . (isset($erreurs[$nom]) ? '<div class="text-danger small mt-1">' . e($erreurs[$nom]) . '</div>' : '');
+    if ($o['aide'] !== '') {
+        $h .= '<div class="form-text">' . e($o['aide']) . '</div>';
+    }
+    return $h . '</fieldset>';
+}
+
 // $options : valeur => libelle
 function champ_select(string $nom, string $libelle, array $options, array $valeurs, array $erreurs, array $o = []): string
 {

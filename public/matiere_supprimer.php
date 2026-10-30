@@ -11,6 +11,7 @@ if ($matiere === null) {
     rediriger('matieres.php');
 }
 $blocage = blocage_suppression_matiere($pdo, $matiere);   // RG09
+$nb_enseignants = compter_enseignants_matiere($pdo, (int) $matiere['id']);
 
 if (requete_post()) {
     csrf_verifier();
@@ -40,6 +41,7 @@ entete('Supprimer une matière', 'matieres');
     <?php carte_debut('carte-danger'); ?>
         <p>Vous allez supprimer <strong>définitivement</strong> la matière
            <strong><?= e($matiere['libelle']) ?></strong> (code <?= e($matiere['code']) ?>).</p>
+        <?php if ($nb_enseignants > 0) : ?><p class="text-muted"><?= (int) $nb_enseignants ?> intervenant(s) sont déclarés enseigner cette matière : ce lien sera retiré.</p><?php endif; ?>
         <form method="post" action="matiere_supprimer.php?id=<?= (int) $matiere['id'] ?>" class="d-flex gap-2">
             <?= csrf_champ() ?>
             <button class="btn btn-danger" type="submit">Oui, supprimer cette matière</button>

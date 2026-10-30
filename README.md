@@ -10,8 +10,8 @@ Installation pas à pas : `docs/installation.pdf`. Schéma et justifications : `
 | `public/` | **Seul dossier servi.** 1 fichier par page, `assets/css` (Bootstrap + `skooly.css`, l'unique surcharge), `assets/js` |
 | `includes/` | `db.php` (connexion PDO) · `session.php` (contrôle de session, 1re ligne de chaque page interne) · `validation.php` · `fonctions_<ensemble>.php` (tout le SQL) · `helpers.php`, `formulaire.php`, `layout.php`, `vues.php` |
 | `config/` | `config.example.php` versionné ; `config.php` (mot de passe) **jamais** versionné |
-| `sql/` | `01_creation_base` · `02_creation_compte` · `03_jeu_demonstration` |
-| `tools/` | `generer_jeu_demo.py` : génère un jeu de données **fictif** (à remplacer par le contenu réel de `ressources.xlsx`) |
+| `sql/` | `01_creation_base` · `02_creation_compte` · `03_jeu_demonstration` (données réelles) · `04_interventions_illustratives` (optionnel) |
+| `tools/` | `xlsx_vers_sql.py` : reprise **rejouable** du classeur `tools/donnees/ressources-skooly.xlsx` → `sql/03` (+ `sql/04` optionnel) et `docs/reprise_des_donnees.md` · `schema_svg.py` : diagramme du schéma |
 
 ## Conventions de nommage des pages
 
