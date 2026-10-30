@@ -1,0 +1,153 @@
+/* ============================================================================
+   SkoolY — UNIQUE fichier de surcharge de Bootstrap : style "cahier / crayon".
+   Principe : les vrais champs, boutons et tableaux restent natifs (donc les
+   formulaires fonctionnent sans JavaScript) ; on leur donne un trait irregulier
+   en CSS pur. Les panneaux utilisent <wired-card> (wired-elements / RoughJS).
+   ========================================================================== */
+
+/* ---- Polices locales (aucun CDN) ---------------------------------------- */
+@font-face { font-family: 'Patrick Hand'; font-style: normal; font-weight: 400; font-display: swap;
+    src: url('../fonts/patrick-hand-latin-400-normal.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Patrick Hand'; font-style: normal; font-weight: 400; font-display: swap;
+    src: url('../fonts/patrick-hand-latin-ext-400-normal.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Permanent Marker'; font-style: normal; font-weight: 400; font-display: swap;
+    src: url('../fonts/permanent-marker-latin-400-normal.woff2') format('woff2'); }
+
+/* ---- Palette et variables ----------------------------------------------- */
+:root {
+    --encre: #1d2a3a;            /* texte et traits */
+    --papier: #fbf6e9;           /* fond de page */
+    --papier-clair: #fffdf7;     /* champs, cartes */
+    --surligneur: #ffe066;
+    --corail: #ff7a6b;
+    --stylo: #2b59c3;            /* liens, focus */
+    --alerte: #b3261e;           /* erreurs (contraste 5.9:1 sur le papier) */
+    --trait: 255px 18px 225px 18px / 18px 225px 18px 255px;   /* coins "a main levee" */
+    --trait-2: 18px 255px 18px 225px / 225px 18px 255px 18px;
+
+    --bs-body-font-family: 'Patrick Hand', 'Segoe Print', 'Comic Sans MS', cursive;
+    --bs-body-color: var(--encre);
+    --bs-body-bg: var(--papier);
+    --bs-border-color: var(--encre);
+    --bs-link-color: var(--stylo);
+    --bs-link-hover-color: #1c3f94;
+    --bs-primary: var(--stylo);
+    --bs-primary-rgb: 43, 89, 195;
+    --bs-secondary-color: #4b5968;
+}
+
+/* ---- Page : papier quadrille -------------------------------------------- */
+body {
+    font-size: 1.2rem;           /* ~19 px = 14 pt : superieur au minimum de 12 pt */
+    line-height: 1.45;
+    background-color: var(--papier);
+    background-image:
+        linear-gradient(rgba(43, 89, 195, .09) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(43, 89, 195, .09) 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'Permanent Marker', 'Patrick Hand', cursive;
+    font-weight: 400;
+    letter-spacing: .02em;
+}
+h1.h3, h1 { display: inline-block; background: linear-gradient(transparent 62%, rgba(255, 224, 102, .85) 62%); padding: 0 .3em; margin-left: -.3em; }
+.text-muted, .form-text { color: #4b5968 !important; }
+a { text-underline-offset: 3px; }
+
+/* ---- Bandeau ------------------------------------------------------------ */
+.bandeau { background: var(--encre); border-bottom: 5px solid var(--corail); font-size: 1.1rem; }
+.bandeau .navbar-brand { font-family: 'Permanent Marker', cursive; font-size: 1.5rem; }
+.marque-y { color: var(--corail); }
+.navbar .nav-link { color: rgba(251, 246, 233, .85); }
+.navbar .nav-link:hover { color: var(--surligneur); }
+.navbar .nav-link.active { color: #fff; font-weight: 400; border-bottom: 3px solid var(--surligneur); }
+.navbar-text { color: rgba(251, 246, 233, .85); }
+
+/* ---- Boutons : encre, ombre decalee, trait irregulier -------------------- */
+.btn {
+    --bs-btn-font-size: 1.1rem; --bs-btn-border-width: 2px; --bs-btn-border-radius: 0;
+    border-radius: var(--trait); box-shadow: 3px 3px 0 var(--encre);
+    transition: transform .08s ease, box-shadow .08s ease, background-color .12s;
+}
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--encre); }
+.btn:active, .btn.active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--encre); }
+.btn:focus-visible { outline: 3px dashed var(--stylo); outline-offset: 3px; box-shadow: 3px 3px 0 var(--encre); }
+.btn-sm { --bs-btn-font-size: 1rem; --bs-btn-padding-y: .15rem; --bs-btn-padding-x: .6rem; box-shadow: 2px 2px 0 var(--encre); }
+.btn-primary { --bs-btn-color: var(--encre); --bs-btn-bg: var(--surligneur); --bs-btn-border-color: var(--encre);
+    --bs-btn-hover-color: var(--encre); --bs-btn-hover-bg: #ffd633; --bs-btn-hover-border-color: var(--encre);
+    --bs-btn-active-color: var(--encre); --bs-btn-active-bg: #ffcc00; --bs-btn-active-border-color: var(--encre); }
+.btn-danger { --bs-btn-color: var(--encre); --bs-btn-bg: var(--corail); --bs-btn-border-color: var(--encre);
+    --bs-btn-hover-color: var(--encre); --bs-btn-hover-bg: #ff6150; --bs-btn-hover-border-color: var(--encre);
+    --bs-btn-active-color: var(--encre); --bs-btn-active-bg: #ff4b38; --bs-btn-active-border-color: var(--encre); }
+.btn-outline-primary, .btn-outline-secondary { --bs-btn-color: var(--encre); --bs-btn-bg: var(--papier-clair); --bs-btn-border-color: var(--encre);
+    --bs-btn-hover-color: var(--encre); --bs-btn-hover-bg: var(--surligneur); --bs-btn-hover-border-color: var(--encre);
+    --bs-btn-active-color: var(--encre); --bs-btn-active-bg: #ffd633; --bs-btn-active-border-color: var(--encre); }
+.btn-outline-danger { --bs-btn-color: var(--alerte); --bs-btn-bg: var(--papier-clair); --bs-btn-border-color: var(--encre);
+    --bs-btn-hover-color: var(--encre); --bs-btn-hover-bg: var(--corail); --bs-btn-hover-border-color: var(--encre);
+    --bs-btn-active-color: var(--encre); --bs-btn-active-bg: #ff6150; --bs-btn-active-border-color: var(--encre); }
+.btn-outline-light { --bs-btn-color: var(--papier); --bs-btn-border-color: var(--papier);
+    --bs-btn-hover-color: var(--encre); --bs-btn-hover-bg: var(--surligneur); --bs-btn-hover-border-color: var(--surligneur);
+    box-shadow: 3px 3px 0 var(--corail); }
+
+/* ---- Champs de formulaire ------------------------------------------------ */
+.form-control, .form-select {
+    font-size: 1.15rem; background-color: var(--papier-clair); color: var(--encre);
+    border: 2px solid var(--encre); border-radius: var(--trait-2);
+}
+.form-control::placeholder { color: #6b7886; }
+.form-control:focus, .form-select:focus { background-color: #fff; border-color: var(--stylo); box-shadow: 3px 3px 0 var(--stylo); }
+.form-label { margin-bottom: .2rem; }
+.champ-obligatoire { color: var(--alerte); font-weight: 700; }
+.form-control.is-invalid, .form-select.is-invalid { border-color: var(--alerte); background-image: none; padding-right: .75rem; }
+.form-control.is-invalid:focus, .form-select.is-invalid:focus { box-shadow: 3px 3px 0 var(--alerte); }
+.invalid-feedback { color: var(--alerte); font-size: 1.05rem; }
+.form-select.is-invalid { background-image: var(--bs-form-select-bg-img); padding-right: 2.25rem; }
+.form-check-input { border: 2px solid var(--encre); background-color: var(--papier-clair); }
+.form-check-input:checked { background-color: var(--encre); border-color: var(--encre); }
+.form-check-input:focus { border-color: var(--stylo); box-shadow: 0 0 0 .2rem rgba(43, 89, 195, .3); }
+
+/* ---- Panneaux : <wired-card> + repli CSS --------------------------------- */
+/* Securite : wired-elements masque ses composants (opacity: 0) tant que leur dessin n'a
+   pas reussi. On annule cela ici : le contenu (formulaires...) est TOUJOURS visible,
+   et tant que le dessin n'existe pas (JavaScript absent ou erreur), le CSS trace le contour. */
+wired-card, wired-divider { opacity: 1; }
+.carte-papier { display: block; padding: 0; margin-bottom: 1rem; color: var(--encre); background: var(--papier-clair); }
+.carte-papier:not(.wired-rendered) { border: 2px solid var(--encre); border-radius: var(--trait); box-shadow: 4px 4px 0 var(--encre); }
+.carte-danger { color: var(--alerte); }                       /* le trait dessine par wired-card prend cette couleur */
+.carte-danger:not(.wired-rendered) { border-color: var(--alerte); box-shadow: 4px 4px 0 var(--alerte); }
+.carte-contenu { padding: 1rem 1.25rem; color: var(--encre); }
+.carte-compteur .nombre { font-family: 'Permanent Marker', cursive; font-size: 2.6rem; line-height: 1.1; color: var(--stylo); }
+a.lien-carte { display: block; height: 100%; color: inherit; text-decoration: none; }
+a.lien-carte:hover .carte-compteur .nombre { color: var(--alerte); }
+a.lien-carte:focus-visible { outline: 3px dashed var(--stylo); outline-offset: 4px; }
+.page-connexion { max-width: 440px; margin: 7vh auto 0; }
+.page-connexion h1 { font-size: 3rem; }
+
+/* ---- Tableaux : lignes surlignees, filets pointilles ---------------------- */
+.table-responsive { background: var(--papier-clair); border: 2px solid var(--encre); border-radius: var(--trait); box-shadow: 4px 4px 0 var(--encre); }
+.table { --bs-table-bg: transparent; --bs-table-color: var(--encre); --bs-table-border-color: rgba(29, 42, 58, .35);
+    --bs-table-striped-bg: rgba(255, 224, 102, .30); --bs-table-striped-color: var(--encre);
+    --bs-table-hover-bg: rgba(43, 89, 195, .12); --bs-table-hover-color: var(--encre); margin-bottom: 0; }
+.table > :not(caption) > * > * { padding: .6rem .7rem; border-bottom: 1px dashed rgba(29, 42, 58, .45); }
+.table thead.table-light > tr > *, .table > thead > tr > * { background: rgba(43, 89, 195, .10); border-bottom: 3px solid var(--encre); font-family: 'Permanent Marker', cursive; font-weight: 400; letter-spacing: .02em; font-size: 1.05rem; }
+.lien-tri { color: inherit; text-decoration: none; white-space: nowrap; }
+.lien-tri:hover { text-decoration: underline wavy var(--corail); }
+
+/* ---- Badges, alertes, pagination ----------------------------------------- */
+.badge { border: 2px solid var(--encre); border-radius: var(--trait); font-weight: 400; font-size: .95rem; padding: .25em .6em; }
+.alert { border: 2px solid var(--encre); border-radius: var(--trait); box-shadow: 3px 3px 0 var(--encre); color: var(--encre); }
+.alert-success { --bs-alert-bg: #dff3c4; }
+.alert-danger { --bs-alert-bg: #ffd9d3; }
+.alert-warning { --bs-alert-bg: #fff0b3; }
+.alert-info { --bs-alert-bg: #d6e4ff; }
+.pagination { gap: 5px; }
+.page-link { border: 2px solid var(--encre); border-radius: var(--trait); color: var(--encre); background: var(--papier-clair); font-size: 1.05rem; }
+.page-link:hover { background: var(--surligneur); color: var(--encre); border-color: var(--encre); }
+.page-item.active .page-link { background: var(--surligneur); color: var(--encre); border-color: var(--encre); font-weight: 700; }
+.page-item.disabled .page-link { color: #7b8794; background: transparent; border-style: dashed; }
+.list-inline-item.badge { color: var(--encre) !important; background: var(--papier-clair) !important; }
+
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }

@@ -1,0 +1,7 @@
+# Jamais versionne : contient le mot de passe de la base
+config/config.php
+# Fichiers d'editeur / systeme
+.vscode/
+.idea/
+.DS_Store
+*.log
